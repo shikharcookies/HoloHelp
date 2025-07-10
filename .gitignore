@@ -1,5 +1,49 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Build outputs
+dist/
+dist-ssr/
+*.local
+build/
+.output/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.example
+
+# API Keys (Critical for Gemini AI)
+.env.gemini
+gemini-api-key.txt
+api-keys.json
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -7,18 +51,431 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+.nyc_output/
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# Next.js build output
+.next
+out/
+
+# Nuxt.js build / generate output
+.nuxt
+dist
+
+# Gatsby files
+.cache/
+public
+
+# Vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless/
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# yarn v2
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Temporary folders
+tmp/
+temp/
+.tmp/
+
+# AR and 3D Model assets (large files)
+*.glb
+*.gltf
+*.fbx
+*.obj
+*.3ds
+*.blend
+*.max
+
+# Image and video assets (if large)
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.svg
+*.ico
+*.tiff
+*.bmp
+
+# Audio files
+*.mp3
+*.wav
+*.ogg
+*.m4a
+*.flac
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Archive files
+*.zip
+*.tar
+*.gz
+*.7z
+*.rar
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Storybook build outputs
+storybook-static
+
+# Temporary files created by editors
+.#*
+*#
+*~
+
+# Python files (if any Python scripts are added)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Java files (if any Java is added)
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Docker
+.dockerignore
+Dockerfile
+docker-compose.yml
+docker-compose.override.yml
+
+# Kubernetes
+*.yaml
+*.yml
+k8s/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Local development
+.local/
+local-config.json
+
+# Performance monitoring
+.clinic/
+clinic.json
+
+# Profiling
+*.prof
+*.cpuprofile
+*.heapprofile
+
+# Memory dumps
+*.hprof
+*.heapsnapshot
+
+# Debug files
+debug.log
+error.log
+
+# Custom HoloHelp specific
+ar-models/
+phone-models/
+instruction-assets/
+voice-samples/
+debug-screenshots/
+
+# Local development overrides
+local.config.js
+dev.config.js
+
+# Generated documentation
+docs/build/
+docs/generated/
+
+# Cache directories
+.cache/
+.parcel-cache/
+.rollup.cache/
+
+# Lock files (choose one based on your package manager)
+# Uncomment the one you DON'T use
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Sentry
+.sentryclirc
+
+# Vercel
+.vercel
+
+# Netlify
+.netlify
+
+# AWS
+.aws/
+
+# Google Cloud
+.gcloud/
+
+# Azure
+.azure/
+
+# Local SSL certificates
+*.pem
+*.key
+*.crt
+*.cert
+
+# SSH keys
+*.ssh
+id_rsa
+id_rsa.pub
+
+# GPG keys
+*.gpg
+*.asc
+
+# Analytics and tracking
+analytics.json
+tracking.json
+
+# AB Testing
+experiments.json
+
+# Feature flags
+flags.json
+
+# Monitoring
+monitoring.json
+
+# Performance metrics
+metrics.json
+
+# User data (should never be committed)
+user-data/
+uploads/
+user-uploads/
+
+# Temporary AR processing files
+ar-processing/
+temp-models/
+processing-queue/
+
+# 3D rendering cache
+render-cache/
+texture-cache/
+model-cache/
+
+# Voice processing temporary files
+voice-temp/
+audio-processing/
+speech-temp/
+
+# AI model files (if downloaded locally)
+models/
+*.model
+*.weights
+*.h5
+*.pb
+*.onnx
+*.tflite
+
+# Jupyter Notebooks (if any data analysis is done)
+.ipynb_checkpoints/
+*.ipynb
+
+# R files (if any R scripts are added)
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+
+# MATLAB files
+*.m~
+*.mat
+*.fig
+*.slx
+
+# Configuration files with sensitive data
+config.production.json
+config.local.json
+secrets.json
+
+# Generated API documentation
+api-docs/
+swagger-ui/
+redoc-static/
+
+# Localization files that are generated
+locales/generated/
+i18n/generated/
+
+# Sitemap (if generated)
+sitemap.xml
+sitemap.xml.gz
+robots.txt
+
+# Lighthouse reports
+lighthouse-reports/
+
+# Bundle analyzer reports
+bundle-analyzer-report.html
+
+# Dependency vulnerabilities
+.snyk
+
+# IDE specific files
+*.sublime-project
+*.sublime-workspace
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Vim
+*.swp
+*.swo
+Session.vim
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Backup files
+*.orig
+*.rej
+
+# Patch files
+*.patch
+*.diff
+
+# Archive and compressed files
+*.tar.xz
+*.tar.bz2
+*.tar.lz
+*.tar.zst
+*.deb
+*.rpm
+*.pkg
+*.dmg
+*.iso
+
+# Windows specific
+*.lnk
+desktop.ini
+
+# Linux specific
+.directory
+.fuse_hidden*
+
+# macOS specific
+.AppleDouble
+.LSOverride
+Icon?
+.DocumentRevisions-V100
+.fseventsd
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk

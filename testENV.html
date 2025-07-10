@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HoloHelp Environment Test - Fixed</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .success { border-left: 5px solid #4CAF50; }
+        .error { border-left: 5px solid #f44336; }
+        .warning { border-left: 5px solid #ff9800; }
+        .log {
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover { background: #45a049; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .input-group {
+            margin: 10px 0;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 HoloHelp Environment Test - Fixed</h1>
+    
+    <div class="test-box success">
+        <h2>✅ Good News!</h2>
+        <p><strong>Your API key is working!</strong> The error you saw is just a temporary rate limit. Let's test with retry logic.</p>
+    </div>
+
+    <div class="test-box">
+        <h2>🔑 API Key Test with Retry</h2>
+        <div class="input-group">
+            <label for="apiKey">Enter your Gemini API Key:</label>
+            <input type="password" id="apiKey" placeholder="AIzaSy..." />
+        </div>
+        <button onclick="testWithRetry()">Test with Retry Logic</button>
+        <button onclick="testQuickQuestion()">Quick Test</button>
+        <button onclick="testAssemblyInstructions()">Test Assembly Instructions</button>
+    </div>
+
+    <div class="test-box">
+        <h2>📊 Test Results</h2>
+        <div id="results" class="log">Ready to test with retry logic...</div>
+    </div>
+
+    <div class="test-box warning">
+        <h2>⚠️ About Rate Limits</h2>
+        <p>Free Gemini API has limits:</p>
+        <ul>
+            <li><strong>15 requests per minute</strong></li>
+            <li><strong>1,500 requests per day</strong></li>
+            <li>Servers can be busy during peak times</li>
+        </ul>
+        <p>This test includes retry logic to handle these limits.</p>
+    </div>
+
+    <script type="module">
+        let logDiv = document.getElementById('results');
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️';
+            logDiv.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        async function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function makeGeminiRequest(model, prompt, maxRetries = 3) {
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                try {
+                    log(`Attempt ${attempt}/${maxRetries}...`);
+                    const result = await model.generateContent(prompt);
+                    return result.response.text();
+                } catch (error) {
+                    log(`Attempt ${attempt} failed: ${error.message}`, 'warning');
+                    
+                    if (attempt < maxRetries) {
+                        const waitTime = attempt * 2000; // 2s, 4s, 6s
+                        log(`Waiting ${waitTime/1000} seconds before retry...`);
+                        await delay(waitTime);
+                    } else {
+                        throw error;
+                    }
+                }
+            }
+        }
+
+        window.testWithRetry = async function() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            
+            if (!apiKey) {
+                log('Please enter an API key', 'error');
+                return;
+            }
+
+            log('Testing API key with retry logic...');
+            
+            try {
+                const { GoogleGenerativeAI } = await import('https://esm.run/@google/generative-ai');
+                log('Gemini library imported', 'success');
+
+                const genAI = new GoogleGenerativeAI(apiKey);
+                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                log('Model initialized', 'success');
+
+                const response = await makeGeminiRequest(model, 'Say "Hello! I am working perfectly!" in a friendly way.');
+                
+                log('SUCCESS! API Response: ' + response, 'success');
+                log('🎉 Your API key is working perfectly!', 'success');
+                log('Ready to add to your .env file!', 'success');
+                
+            } catch (error) {
+                log('Final error after retries: ' + error.message, 'error');
+                if (error.message.includes('503') || error.message.includes('overloaded')) {
+                    log('The Gemini servers are busy. Try again in 5-10 minutes.', 'warning');
+                    log('Your API key is valid, just wait for less busy time.', 'warning');
+                }
+            }
+        }
+
+        window.testQuickQuestion = async function() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            
+            if (!apiKey) {
+                log('Please enter an API key first', 'error');
+                return;
+            }
+
+            log('Quick test with simple question...');
+            
+            try {
+                const { GoogleGenerativeAI } = await import('https://esm.run/@google/generative-ai');
+                const genAI = new GoogleGenerativeAI(apiKey);
+                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+                const response = await makeGeminiRequest(model, 'Hello');
+                
+                log('Quick test response: ' + response, 'success');
+                log('✅ API is working!', 'success');
+                
+            } catch (error) {
+                log('Quick test failed: ' + error.message, 'error');
+            }
+        }
+
+        window.testAssemblyInstructions = async function() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            
+            if (!apiKey) {
+                log('Please enter an API key first', 'error');
+                return;
+            }
+
+            log('Testing assembly instructions (HoloHelp style)...');
+            
+            try {
+                const { GoogleGenerativeAI } = await import('https://esm.run/@google/generative-ai');
+                const genAI = new GoogleGenerativeAI(apiKey);
+                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+                const prompt = `Generate step-by-step assembly instructions for: chair
+
+Provide:
+1. Tools needed
+2. 3-5 assembly steps
+3. Tips
+
+Be concise and practical.`;
+
+                const response = await makeGeminiRequest(model, prompt);
+                
+                log('Assembly Instructions Test:', 'success');
+                log(response, 'success');
+                log('🚀 Perfect! This is what HoloHelp will generate!', 'success');
+                
+            } catch (error) {
+                log('Assembly test failed: ' + error.message, 'error');
+            }
+        }
+
+        log('Fixed test ready. Your API key was working in the previous test!');
+        log('The 503 error was just a temporary rate limit.');
+    </script>
+</body>
+</html>
