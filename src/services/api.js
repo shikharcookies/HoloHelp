@@ -1,11 +1,8 @@
 // src/services/api.js - Enhanced API Service Layer for HoloHelp with Gemini Integration
 
-const API_BASE =
-  import.meta.env.MODE === 'development'
-    ? 'http://localhost:3001'
-    : 'https://holohelp-1.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
-console.log('API Base URL:', API_BASE); // Debug log
+console.log('API Base URL:', API_BASE_URL); // Debug log
 
 class APIError extends Error {
   constructor(message, status, data) {
@@ -18,7 +15,7 @@ class APIError extends Error {
 
 // Generic API request handler with better error handling
 async function apiRequest(endpoint, options = {}) {
-  const url = `${API_BASE}${endpoint}`;
+  const url = `${API_BASE_URL}${endpoint}`;
   
   console.log('Making API request to:', url); // Debug log
   
@@ -152,26 +149,27 @@ export const chatAPI = {
 
 // Health Check API
 export const healthAPI = {
-  async checkStatus() {
-    // Use direct health endpoint instead of API prefix
-    const url = `https://holohelp-1.onrender.com/health`;
-    console.log('Checking health at:', url);
+async checkStatus() {
+  // Use the backend base URL without the /api suffix
+  const baseUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+  const url = `${baseUrl}/health`;
+  console.log('Checking health at:', url);
+  
+  try {
+    const response = await fetch(url, { timeout: 5000 });
+    const data = await response.json();
+    console.log('Health check response:', data);
     
-    try {
-      const response = await fetch(url, { timeout: 5000 });
-      const data = await response.json();
-      console.log('Health check response:', data);
-      
-      if (!response.ok) {
-        throw new Error(`Health check failed: ${response.status}`);
-      }
-      
-      return data;
-    } catch (error) {
-      console.error('Health check error:', error);
-      throw error;
+    if (!response.ok) {
+      throw new Error(`Health check failed: ${response.status}`);
     }
+    
+    return data;
+  } catch (error) {
+    console.error('Health check error:', error);
+    throw error;
   }
+}
 };
 
 // Enhanced utility functions
@@ -195,7 +193,7 @@ export const utils = {
       // This will be imported dynamically if available
       const geminiKey = import.meta.env.VITE_GEMINI_API_KEY;
       return !!geminiKey;
-    } catch (error) {
+    } catch  {
       return false;
     }
   },
@@ -336,19 +334,14 @@ export const assemblyAPI = {
   // Request assembly instructions for any item
   async getAssemblyInstructions(itemName, context = {}) {
     console.log('Getting assembly instructions for:', itemName);
-    
-    try {
-      // Try backend first
-      const response = await chatAPI.sendAssemblyQuery(itemName, JSON.stringify(context));
-      return {
-        success: true,
-        source: 'backend',
-        instructions: response.response
-      };
-    } catch (error) {
-      // Backend failed, caller should try Gemini
-      throw error;
-    }
+
+    // Try backend first
+    const response = await chatAPI.sendAssemblyQuery(itemName, JSON.stringify(context));
+    return {
+      success: true,
+      source: 'backend',
+      instructions: response.response
+    };
   },
 
   // Get predefined assembly instructions (fallback)

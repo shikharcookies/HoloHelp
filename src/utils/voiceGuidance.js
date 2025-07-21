@@ -219,7 +219,7 @@ export class VoiceGuidanceManager {
 export const voiceGuidance = new VoiceGuidanceManager();
 
 // Auto-test voice on load (for development)
-if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+if (typeof window !== 'undefined' && import.meta.env.MODE === 'development') {
   window.voiceGuidance = voiceGuidance;
   console.log('🎙️ Voice guidance available globally as window.voiceGuidance');
 }
