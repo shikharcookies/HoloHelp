@@ -6,38 +6,30 @@ import ObjectDetector from './components/ObjectDetector'
 import ARCanvas from './components/ARCanvas'
 import HelpAssistant from './components/HelpAssistant'
 import MobileProblemSelector from './components/MobileProblemSelector'
-import { healthAPI, deviceAPI, utils, errorHandler } from './services/api'
+import { deviceAPI, utils, } from './services/api'
 import { voiceGuidance } from './utils/voiceGuidance'
-import BrowserCheck from './components/BrowserCheck';
+import BrowserCheck from './components/BrowserCheck'
+import process from 'process'
 
 export default function App() {
-  // Detection and AR state
   const [detectedObject, setDetectedObject] = useState(null)
   const [showAR, setShowAR] = useState(false)
   const [showProblemSelector, setShowProblemSelector] = useState(false)
   const [startDetection, setStartDetection] = useState(false)
   const [instructions, setInstructions] = useState(null)
   const [selectedProblem, setSelectedProblem] = useState(null)
-  
-  // Loading and error states
   const [isLoadingInstructions, setIsLoadingInstructions] = useState(false)
   const [backendStatus, setBackendStatus] = useState('checking')
   const [error, setError] = useState(null)
   const [debugInfo, setDebugInfo] = useState(null)
 
-  // Check backend connection on mount
   useEffect(() => {
     const checkBackend = async () => {
       try {
-        const response = await fetch('http://localhost:3001/health');
-        const data = await response.json();
-        console.log('Backend health check:', data);
-        
         const isOnline = await utils.isBackendOnline()
-        console.log('Utils health check:', isOnline);
         setBackendStatus(isOnline ? 'online' : 'offline')
       } catch (error) {
-        console.error('Backend connection error:', error);
+        console.error('Backend connection error:', error)
         setBackendStatus('offline')
       }
     }
@@ -47,12 +39,8 @@ export default function App() {
     return () => clearInterval(interval)
   }, [])
 
-  // Handle mobile phone detection with enhanced feedback
   const handleObjectDetection = async (detectionResult) => {
-    console.log('📱 Enhanced mobile phone detected:', detectionResult)
     setDetectedObject(detectionResult)
-    
-    // Enhanced voice feedback for phone detection
     if (detectionResult.deviceType === 'mobile_phone') {
       voiceGuidance.speak("Mobile phone detected successfully! Now please select the problem you're experiencing.")
       setShowProblemSelector(true)
@@ -60,76 +48,57 @@ export default function App() {
     }
   }
 
-  // Handle problem selection with enhanced AR setup
-  // In App.jsx, update the handleProblemSelected function:
+  const handleProblemSelected = async (problemId) => {
+    setSelectedProblem(problemId)
+    setIsLoadingInstructions(true)
+    setError(null)
 
-const handleProblemSelected = async (problemId) => {
-  console.log('🎯 Problem selected for enhanced AR:', problemId)
-  setSelectedProblem(problemId)
-  setIsLoadingInstructions(true)
-  setError(null)
+    try {
+      await voiceGuidance.speakProblemIntroduction(problemId)
+      const instructionData = await deviceAPI.getInstructions(problemId)
 
-  try {
-    // Enhanced voice introduction for the selected problem
-    await voiceGuidance.speakProblemIntroduction(problemId)
+      if (instructionData.success) {
+        const formattedInstructions = {
+          totalSteps: instructionData.total_steps,
+          estimatedTime: instructionData.estimated_time,
+          problemType: problemId,
+          steps: instructionData.steps.map((step, index) => ({
+            id: step.step || (index + 1),
+            step: step.step || (index + 1),
+            title: step.title || `Step ${index + 1}`,
+            description: step.description || 'Follow the AR instructions',
+            position: step.position || [0, 0, -1],
+            asset: step.asset,
+            voiceover: step.voiceover || step.description || step.title,
+            highlight: step.highlight,
+            duration: step.duration || 8000,
+            isCompleted: false,
+            isActive: index === 0,
+            componentTarget: getComponentFromStep(step)
+          }))
+        }
 
-    // Call backend to get instructions for the specific problem
-    const response = await fetch('http://localhost:3001/api/phone-problem', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ problem: problemId })
-    });
+        setInstructions(formattedInstructions)
+        setShowProblemSelector(false)
+        setShowAR(true)
 
-    const instructionData = await response.json();
-    
-    if (instructionData.success) {
-      // Fix: Ensure proper step formatting
-      const formattedInstructions = {
-        totalSteps: instructionData.total_steps,
-        estimatedTime: instructionData.estimated_time,
-        problemType: problemId,
-        steps: instructionData.steps.map((step, index) => ({
-          id: step.step || (index + 1), // Fix: Ensure step ID exists
-          step: step.step || (index + 1), // Fix: Ensure step number exists
-          title: step.title || `Step ${index + 1}`,
-          description: step.description || 'Follow the AR instructions',
-          position: step.position || [0, 0, -1],
-          asset: step.asset,
-          voiceover: step.voiceover || step.description || step.title,
-          highlight: step.highlight,
-          duration: step.duration || 8000,
-          isCompleted: false,
-          isActive: index === 0,
-          componentTarget: getComponentFromStep(step)
-        }))
-      };
-      
-      console.log('✅ Formatted instructions:', formattedInstructions);
-      
-      setInstructions(formattedInstructions)
-      setShowProblemSelector(false)
-      setShowAR(true)
-
-      // Enhanced voice guidance for AR mode
-      setTimeout(() => {
-        voiceGuidance.speak("AR mode activated! Follow the 3D instructions to fix your phone.")
-      }, 2000)
-    } else {
-      throw new Error(instructionData.error || 'Failed to load instructions');
+        setTimeout(() => {
+          voiceGuidance.speak("AR mode activated! Follow the 3D instructions to fix your phone.")
+        }, 2000)
+      } else {
+        throw new Error(instructionData.error || 'Failed to load instructions')
+      }
+    } catch (error) {
+      console.error('Failed to load enhanced problem instructions:', error)
+      setError('Failed to load AR instructions. Please try again.')
+      voiceGuidance.speak("Sorry, there was an error loading the instructions. Please try again.")
+    } finally {
+      setIsLoadingInstructions(false)
     }
-  } catch (error) {
-    console.error('Failed to load enhanced problem instructions:', error)
-    setError('Failed to load AR instructions. Please try again.')
-    voiceGuidance.speak("Sorry, there was an error loading the instructions. Please try again.")
-  } finally {
-    setIsLoadingInstructions(false)
   }
-}
 
-  // Enhanced component detection from step
   const getComponentFromStep = (step) => {
     const stepTitle = step.title.toLowerCase()
-    
     if (stepTitle.includes('battery')) return 'battery'
     if (stepTitle.includes('restart') || stepTitle.includes('power')) return 'power_button'
     if (stepTitle.includes('app') || stepTitle.includes('close')) return 'apps'
@@ -137,8 +106,7 @@ const handleProblemSelected = async (problemId) => {
     if (stepTitle.includes('storage') || stepTitle.includes('cache')) return 'storage'
     if (stepTitle.includes('wifi') || stepTitle.includes('network')) return 'wifi'
     if (stepTitle.includes('cool') || stepTitle.includes('heat')) return 'cooling'
-    
-    return 'screen' // default
+    return 'screen'
   }
 
   const handleDetectionError = (error) => {
@@ -148,7 +116,7 @@ const handleProblemSelected = async (problemId) => {
   }
 
   const resetToScanning = () => {
-    voiceGuidance.stop() // Stop any ongoing voice guidance
+    voiceGuidance.stop()
     setShowAR(false)
     setShowProblemSelector(false)
     setDetectedObject(null)
@@ -164,42 +132,16 @@ const handleProblemSelected = async (problemId) => {
     voiceGuidance.speak("Starting new phone detection. Please point your camera at your mobile phone.")
   }
 
-  // Enhanced step completion handler
-  // In App.jsx, update the step completion handlers:
+  const handleStepComplete = (stepId) => {
+    console.log('✅ Enhanced step completed:', stepId)
+    // Optional: Play sound or update UI here
+  }
 
-const handleStepComplete = (stepId) => {
-  console.log('✅ Enhanced step completed:', stepId)
-  
-  // Trigger celebration sound if available
-  if (typeof Audio !== 'undefined') {
-    try {
-      // You can add a success sound here
-      console.log('🎵 Step completion sound would play here');
-    } catch (error) {
-      console.log('Sound not available');
-    }
+  const handleInstructionComplete = () => {
+    console.log('🎉 All enhanced troubleshooting steps completed!')
+    // Optional: show notification or track event
   }
-}
 
-const handleInstructionComplete = () => {
-  console.log('🎉 All enhanced troubleshooting steps completed!')
-  
-  // Show success notification
-  if (Notification && Notification.permission === 'granted') {
-    new Notification('Phone Fixed!', {
-      body: `${selectedProblem?.replace('_', ' ')} troubleshooting completed successfully!`,
-      icon: '/phone-icon.png' // Add if you have an icon
-    });
-  }
-  
-  // Analytics tracking (if implemented)
-  if (typeof gtag !== 'undefined') {
-    gtag('event', 'troubleshooting_completed', {
-      problem_type: selectedProblem,
-      total_steps: instructions?.totalSteps || 0
-    });
-  }
-}
   const getConnectionIndicator = () => {
     switch (backendStatus) {
       case 'online':
@@ -210,6 +152,7 @@ const handleInstructionComplete = () => {
         return <div className="w-4 h-4 rounded-full bg-gray-400 animate-pulse" />
     }
   }
+
 
   return (
     <BrowserCheck>

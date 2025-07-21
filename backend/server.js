@@ -1,17 +1,21 @@
-// server.js - Enhanced HoloHelp Backend API - Mobile Phone AR Troubleshooting
-const express = require('express');
-const multer = require('multer');
-const cors = require('cors');
+// Import required packages
+import express from "express";
+import cors from "cors";
+import bodyParser from "body-parser";
+import multer from "multer";
+import process from "process";
 
+// Initialize Express app
 const app = express();
-const PORT = process.env.PORT || 3001;
 
-// Middleware
+// Enable CORS for all origins (adjust if needed for production)
 app.use(cors({
   origin: ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3000'],
   credentials: true
 }));
-app.use(express.json({ limit: '10mb' }));
+
+// Parse incoming JSON data with increased limit for image uploads
+app.use(bodyParser.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Multer for image uploads
@@ -276,7 +280,10 @@ const classifyDevice = (detectedObjects) => {
  return null;
 };
 
-// Routes
+// Root route for health check (important for Render to detect server is alive)
+app.get("/", (req, res) => {
+  res.send("HoloHelp AR Backend is live 🚀📱");
+});
 
 // Enhanced health check with AR capabilities
 app.get('/health', (req, res) => {
@@ -293,6 +300,14 @@ app.get('/health', (req, res) => {
      enhanced_3d_models: true
    }
  });
+});
+
+// Example API route
+app.post("/api/getRes", (req, res) => {
+  const { data } = req.body;
+  console.log("Received data:", data);
+  // Respond back
+  res.json({ response: "Hello from HoloHelp AR backend" });
 });
 
 // Enhanced device recognition endpoint with AR metadata
@@ -633,14 +648,16 @@ app.get('/api/ar-capabilities', (req, res) => {
  });
 });
 
-// Enhanced startup message
+// Use dynamic port (Render sets PORT environment variable)
+const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
- console.log(`🚀 Enhanced HoloHelp AR Mobile Troubleshooting API running on port ${PORT}`);
- console.log(`📱 Health check: http://localhost:${PORT}/health`);
- console.log(`🔍 Enhanced API docs: http://localhost:${PORT}/api/devices`);
- console.log(`📞 AR phone detection: http://localhost:${PORT}/api/recognize-device`);
- console.log(`✨ AR capabilities: http://localhost:${PORT}/api/ar-capabilities`);
- console.log(`🎯 Features: 3D Models, Component Highlighting, Voice Guidance, Particle Effects`);
+  console.log(`🚀 Enhanced HoloHelp AR Mobile Troubleshooting API running on port ${PORT}`);
+  console.log(`📱 Health check: http://localhost:${PORT}/health`);
+  console.log(`🔍 Enhanced API docs: http://localhost:${PORT}/api/devices`);
+  console.log(`📞 AR phone detection: http://localhost:${PORT}/api/recognize-device`);
+  console.log(`✨ AR capabilities: http://localhost:${PORT}/api/ar-capabilities`);
+  console.log(`🎯 Features: 3D Models, Component Highlighting, Voice Guidance, Particle Effects`);
 });
 
-module.exports = app;
+export default app;

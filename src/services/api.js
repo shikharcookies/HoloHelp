@@ -1,8 +1,11 @@
 // src/services/api.js - Enhanced API Service Layer for HoloHelp with Gemini Integration
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_BASE =
+  import.meta.env.MODE === 'development'
+    ? 'http://localhost:3001'
+    : 'https://holohelp-1.onrender.com';
 
-console.log('API Base URL:', API_BASE_URL); // Debug log
+console.log('API Base URL:', API_BASE); // Debug log
 
 class APIError extends Error {
   constructor(message, status, data) {
@@ -15,7 +18,7 @@ class APIError extends Error {
 
 // Generic API request handler with better error handling
 async function apiRequest(endpoint, options = {}) {
-  const url = `${API_BASE_URL}${endpoint}`;
+  const url = `${API_BASE}${endpoint}`;
   
   console.log('Making API request to:', url); // Debug log
   
@@ -151,7 +154,7 @@ export const chatAPI = {
 export const healthAPI = {
   async checkStatus() {
     // Use direct health endpoint instead of API prefix
-    const url = `http://localhost:3001/health`;
+    const url = `https://holohelp-1.onrender.com/health`;
     console.log('Checking health at:', url);
     
     try {
