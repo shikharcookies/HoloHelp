@@ -1,0 +1,31 @@
+# Frontend .env file (in HoloHelp root)
+# Create: .env
+
+# Backend API URL
+VITE_API_URL=http://localhost:3001/api
+# Create .env file in HoloHelp root (same level as package.json)
+echo "VITE_API_URL=http://localhost:3001/api" > .env
+# Development mode
+VITE_NODE_ENV=development
+
+# Enable debug logging
+VITE_DEBUG=true
+
+#-------------------------------------------
+
+# Backend .env file (in backend folder)
+# Create: backend/.env
+
+# Server configuration
+PORT=3001
+NODE_ENV=development
+
+# Gemini AI API Key (optional - get from Google AI Studio)
+VITE_GEMINI_API_KEY=AIzaSyApJ7ahAJpJfpR5vl6fJpjFFtjwbOnTgkQ
+
+
+# CORS settings
+CORS_ORIGIN=http://localhost:5173
+
+# Enable debug logging
+DEBUG=true
