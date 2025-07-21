@@ -13,10 +13,12 @@ const corsOrigin = process.env.CORS_ORIGIN?.split(",") || [];
 
 app.use(cors({
   origin: function (origin, callback) {
+    console.log('Request origin:', origin);
     if (!origin || corsOrigin.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS: " + origin));
+      console.error('CORS blocked:', origin);
+      callback(new Error("Not allowed by CORS"));
     }
   },
   credentials: true
