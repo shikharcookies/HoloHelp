@@ -9,10 +9,19 @@ import process from "process";
 const app = express();
 
 // Enable CORS for all origins (adjust if needed for production)
+const corsOrigin = process.env.CORS_ORIGIN?.split(",") || [];
+
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3000'],
+  origin: function (origin, callback) {
+    if (!origin || corsOrigin.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true
 }));
+
 
 // Parse incoming JSON data with increased limit for image uploads
 app.use(bodyParser.json({ limit: '10mb' }));
