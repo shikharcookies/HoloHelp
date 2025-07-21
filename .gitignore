@@ -14,11 +14,6 @@ build/
 .output/
 
 # Environment variables
-.env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.example
 
 # API Keys (Critical for Gemini AI)
 .env.gemini
