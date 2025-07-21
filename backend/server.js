@@ -22,6 +22,12 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
+
+app.get('/', (req, res) => {
+  res.send('HoloHelp backend is online!');
+});
+
+
 // Enhanced mobile phone troubleshooting instructions database with AR components
 const mobileInstructions = {
   "battery_drain": {
