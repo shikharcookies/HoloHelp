@@ -16,11 +16,12 @@ app.use(cors({
     if (!origin || corsOrigin.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(new Error("Not allowed by CORS: " + origin));
     }
   },
   credentials: true
 }));
+
 
 
 // Parse incoming JSON data with increased limit for image uploads
